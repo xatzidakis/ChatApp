@@ -38,7 +38,6 @@ function Register() {
                 localStorage.setItem('chat-app-user', JSON.stringify(data.user))
             }
             navigate('/');
-            1:12
         }
     }
 
