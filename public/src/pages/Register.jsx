@@ -8,7 +8,7 @@ import axios from 'axios'
 import { registerRoute } from '../utils/APIRoutes'
 
 function Register() {
-    const navigate = useNavigate
+    const navigate = useNavigate()
     const [values, setValues] = useState({
         username: '',
         email: '',
@@ -24,6 +24,12 @@ function Register() {
         theme: 'dark'
     }
 
+    useEffect(() => {
+        if(localStorage.getItem('chat-app-user')) {
+            navigate('/')
+        }
+    }, [])
+
     const handleSubmit = async (event) => {
         event.preventDefault();
         if(handleValidation()) {
@@ -36,8 +42,9 @@ function Register() {
             }
             if(data.status === true) {
                 localStorage.setItem('chat-app-user', JSON.stringify(data.user))
+                navigate("/");
             }
-            navigate('/');
+            
         }
     }
 
