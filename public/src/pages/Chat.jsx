@@ -57,7 +57,7 @@ function Chat() {
           isLoaded && currentChat === null ? 
           <Welcome currentUser={currentUser} /> : 
             
-            <ChatContainer currentChat={currentChat} />
+            <ChatContainer currentChat={currentChat} currentUser={currentUser} />
             
             
         }
