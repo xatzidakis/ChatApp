@@ -53,6 +53,10 @@ const Container = styled.div`
   background-color: #080420;
   padding: 0 2rem;
   padding-bottom: 0.3rem;
+  @media screen and (min-width:720px) and (max-width: 1080px) {
+    padding: 0 1rem;
+    gap: 1rem;
+  }
   .button-container {
     display: flex;
     align-items: center;
@@ -103,7 +107,6 @@ const Container = styled.div`
     background-color: #ffffff34;
     input {
       width: 90%;
-      height: 60%;
       background-color: transparent;
       color: white;
       border: none;
@@ -124,6 +127,10 @@ const Container = styled.div`
       align-items: center;
       background-color: #9a86f3;
       border: none;
+      @media screen and (min-width:720px) and (max-width: 1080px) {
+        padding: 0.3rem 1rem;
+        font-size: 1rem;
+      }
       svg {
         font-size: 2rem;
         color: white;
