@@ -114,7 +114,7 @@ const Container = styled.div`
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 0 2rem;
+        padding: 3rem 2rem;
         .user-details {
             display: flex;
             align-items: center;
@@ -122,6 +122,7 @@ const Container = styled.div`
             .avatar {
                 img {
                     height: 3rem;
+                    padding: 0.5rem;
                 }
             }
             .username {
