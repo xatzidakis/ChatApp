@@ -1,12 +1,15 @@
+import axios from 'axios'
 import React, {useState, useEffect} from 'react'
 import styled from 'styled-components'
 import Logo from '../assets/logojira.svg'
+import {getUnreadNumRoute} from '../utils/APIRoutes'
 
 function Contacts({contacts, currentUser, changeChat}) {
 
   const [currentUserName, setCurrentUserName] = useState(null)
   const [currentUserImage, setCurrentUserImage] = useState(null)
   const [currentSelected, setCurrentSelected] = useState(null)
+  const [unreadNum, setUnreadNum] = useState([])
 
   useEffect(() => {
     if(currentUser) {
@@ -15,6 +18,34 @@ function Contacts({contacts, currentUser, changeChat}) {
     }
 
   }, [currentUser])
+  const getUsersUnread = async () => {
+    console.log('lalalalalala');
+    const promiseArr = contacts.map( (contact, index) => 
+        axios.post(getUnreadNumRoute, {from: contact._id, to: currentUser._id})
+    )
+    console.log('promiseArr:', promiseArr)
+     
+      const values = Promise.all(promiseArr)
+    console.log('1');
+    // setTimeout(() =>{console.log('asdfas')}, 5000)
+    const val = await values
+    console.log(2)
+    console.log('values:', val)
+  }
+
+  // useEffect( () => {
+  //   console.log('here')
+  //   if(currentUser) {
+     
+  //     getUsersUnread()
+  //   }
+    
+  // }, [currentSelected])
+
+  // useEffect(() => {
+  //   let newArr = unreadNum.map(e => e)
+  //   setUnreadNum(newArr)
+  // }, [unreadNum])
 
   const changeCurrentChat = (index, contact) => {
     setCurrentSelected(index);
@@ -41,13 +72,19 @@ function Contacts({contacts, currentUser, changeChat}) {
                     <div className="username">
                       <h2>{contact.username}</h2>
                     </div>
+                    <div className="info">
+                      <div className="timestamp">Timestamp</div>
+                      <div className="unreadNum">
+                        {unreadNum[index]}
+                      </div>
+                    </div>
                   </div>
                 )
               })
             }
             
           </div>
-          <div className="current-user">
+          <div className="current-user" onClick={getUsersUnread}>
           <div className="avatar">
                       <img src={`data:image/svg+xml;base64,${currentUserImage}`} alt="avatar" />
                     </div>
@@ -112,6 +149,32 @@ const Container = styled.div`
       .username {
         h3 {
           color: white;
+        }
+      }
+      .info {
+        margin-left: auto;
+        border: solid;
+        display: flex;
+        flex-direction: column;
+        height: 90%;
+        align-items: center;
+        .unreadNum {
+          /* flex-grow: 1; */
+          height: 20%;
+          background: #d9aef1;
+          border-radius: 50%;
+          font-size: 0.9rem;
+          width: 1.1rem;
+          height: 1.1rem;
+          display: flex;
+          align-items: center;
+          text-align: center;
+          justify-content: center;
+          margin-top: 0.3rem;
+        }
+        .timestamp {
+          /* flex-grow: 2; */
+          height: 40%;
         }
       }
     }

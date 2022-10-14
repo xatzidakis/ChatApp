@@ -34,3 +34,19 @@ module.exports.getAllMessage = async (req, res, next) => {
         next(error)
     }
 }
+
+module.exports.getUnreadNum = async (req, res, next) => {
+    try {
+        const {from, to} = req.body;
+        console.log('currentUser id:', to)
+        console.log('sender id:', from)
+        const unreadNum = await messageModel.find({
+            sender: { $ne: to},
+            users: {$all: [from, to]},
+            isRead: false
+        }).count()
+        console.log('unreadNum:', unreadNum)
+    } catch (error) {
+        next(error)
+    }
+}
