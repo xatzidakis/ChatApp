@@ -46,6 +46,7 @@ module.exports.getUnreadNum = async (req, res, next) => {
             isRead: false
         }).count()
         console.log('unreadNum:', unreadNum)
+        res.json(unreadNum)
     } catch (error) {
         next(error)
     }

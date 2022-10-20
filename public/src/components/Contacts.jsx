@@ -1,10 +1,10 @@
 import axios from 'axios'
-import React, {useState, useEffect} from 'react'
+import React, {useState, useEffect, userRef} from 'react'
 import styled from 'styled-components'
 import Logo from '../assets/logojira.svg'
-import {getUnreadNumRoute} from '../utils/APIRoutes'
+import {getUnreadNumRoute, host} from '../utils/APIRoutes'
 
-function Contacts({contacts, currentUser, changeChat}) {
+function Contacts({contacts, currentUser, changeChat, socket}) {
 
   const [currentUserName, setCurrentUserName] = useState(null)
   const [currentUserImage, setCurrentUserImage] = useState(null)
@@ -18,34 +18,28 @@ function Contacts({contacts, currentUser, changeChat}) {
     }
 
   }, [currentUser])
-  const getUsersUnread = async () => {
-    console.log('lalalalalala');
-    const promiseArr = contacts.map( (contact, index) => 
-        axios.post(getUnreadNumRoute, {from: contact._id, to: currentUser._id})
-    )
-    console.log('promiseArr:', promiseArr)
-     
-      const values = Promise.all(promiseArr)
-    console.log('1');
-    // setTimeout(() =>{console.log('asdfas')}, 5000)
-    const val = await values
-    console.log(2)
-    console.log('values:', val)
-  }
 
-  // useEffect( () => {
-  //   console.log('here')
-  //   if(currentUser) {
-     
-  //     getUsersUnread()
-  //   }
+  // const getUsersUnread = async () => {
+  //   // console.log('lalalalalala');
+  //   // const promiseArr = contacts.map( (contact, index) => 
+  //   //     axios.post(getUnreadNumRoute, {from: contact._id, to: currentUser._id})
+  //   // )
+  //   //   const values = await Promise.all(promiseArr)
+  //   // console.log('values:', values)
+  // }
+
+  useEffect(() => {
     
-  // }, [currentSelected])
-
-  // useEffect(() => {
-  //   let newArr = unreadNum.map(e => e)
-  //   setUnreadNum(newArr)
-  // }, [unreadNum])
+    const getUnread = async () => {
+      const promiseArr = contacts.map( (contact, index) => 
+      axios.post(getUnreadNumRoute, {from: contact._id, to: currentUser._id})
+      )
+      const values = (await Promise.all(promiseArr)).map(value => value.data)
+      setUnreadNum(values)    
+    }
+    if(currentUser)
+    getUnread();
+  }, [contacts])
 
   const changeCurrentChat = (index, contact) => {
     setCurrentSelected(index);
@@ -84,7 +78,7 @@ function Contacts({contacts, currentUser, changeChat}) {
             }
             
           </div>
-          <div className="current-user" onClick={getUsersUnread}>
+          <div className="current-user">
           <div className="avatar">
                       <img src={`data:image/svg+xml;base64,${currentUserImage}`} alt="avatar" />
                     </div>

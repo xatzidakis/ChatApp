@@ -1,13 +1,15 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import styled from 'styled-components'
 import { Link, useNavigate } from 'react-router-dom'
 import Logo from '../assets/logojira.svg'
 import {ToastContainer, toast} from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css';
 import axios from 'axios'
-import { registerRoute } from '../utils/APIRoutes'
+import { registerRoute, host } from '../utils/APIRoutes'
+import {io} from 'socket.io-client'
 
 function Register() {
+    const socket = io(host)
     const navigate = useNavigate()
     const [values, setValues] = useState({
         username: '',
@@ -30,6 +32,10 @@ function Register() {
         }
     }, [])
 
+    // useEffect(() => {
+    //     socket = io(host)
+    // }, [])
+
     const handleSubmit = async (event) => {
         event.preventDefault();
         if(handleValidation()) {
@@ -42,6 +48,7 @@ function Register() {
             }
             if(data.status === true) {
                 localStorage.setItem('chat-app-user', JSON.stringify(data.user))
+                socket.emit('user-registered', data.user)
                 navigate("/");
             }
             

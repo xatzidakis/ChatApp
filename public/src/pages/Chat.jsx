@@ -61,7 +61,7 @@ function Chat() {
       
         <Container>
       <div className='container'>
-        <Contacts contacts={contacts} currentUser={currentUser} changeChat={handleChatChange} />
+        <Contacts contacts={contacts} currentUser={currentUser} changeChat={handleChatChange} socket={socket} />
         {
           isLoaded && currentChat === null ? 
           <Welcome currentUser={currentUser} /> : 
