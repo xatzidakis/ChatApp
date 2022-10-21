@@ -19,15 +19,6 @@ function Contacts({contacts, currentUser, changeChat, socket}) {
 
   }, [currentUser])
 
-  // const getUsersUnread = async () => {
-  //   // console.log('lalalalalala');
-  //   // const promiseArr = contacts.map( (contact, index) => 
-  //   //     axios.post(getUnreadNumRoute, {from: contact._id, to: currentUser._id})
-  //   // )
-  //   //   const values = await Promise.all(promiseArr)
-  //   // console.log('values:', values)
-  // }
-
   useEffect(() => {
     
     const getUnread = async () => {
