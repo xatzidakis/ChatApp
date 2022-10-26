@@ -1,9 +1,8 @@
 import React from "react";
-import {io} from 'socket.io-client'
+import socketio from 'socket.io-client'
 import {host} from '../utils/APIRoutes'
 
-const socket = io(host)
+export const socket = socketio(host)
 
-const SocketContext = React.createContext(socket)
+export const SocketContext = React.createContext(socket)
 
-export default SocketContext;
