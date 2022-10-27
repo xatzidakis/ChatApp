@@ -54,6 +54,6 @@ io.on('connection', (socket) => {
 
     socket.on('test-socket', data => {
         console.log('Test socket fired with data:', data)
-        socket.emit('lala', 'lala from index.js')
+        // socket.emit('lala', 'lala from index.js')
     })
 })
