@@ -59,8 +59,9 @@ function Contacts({contacts, currentUser, changeChat, socket}) {
                     </div>
                     <div className="info">
                       <div className="timestamp">Timestamp</div>
-                      <div className="unreadNum">
-                        {unreadNum[index]}
+                      {/* <div className={`unreadNum ${unreadNum[index] && 'hasUnread'}`}> */}
+                      <div className={`unreadNum ${unreadNum[index] > 0 ? 'hasUnread' : ''}`}>
+                        {unreadNum[index] > 0 ? unreadNum[index] : ''}
                       </div>
                     </div>
                   </div>
@@ -143,7 +144,7 @@ const Container = styled.div`
         flex-direction: column;
         height: 90%;
         align-items: center;
-        .unreadNum {
+        .hasUnread {
           /* flex-grow: 1; */
           height: 20%;
           background: #d9aef1;

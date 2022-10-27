@@ -1,13 +1,17 @@
-import React from 'react'
+import React, { useRef } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Chat from './pages/Chat'
 import Login from './pages/Login'
 import Register from './pages/Register'
 import SetAvatar from './pages/SetAvatar'
 import Test from './pages/Test'
+import {SocketContext, socket} from './store/socket-context'
+import {io} from 'socket.io-client'
+import { host } from './utils/APIRoutes'
 
 export default function App() {
   return (
+    <SocketContext.Provider value={socket}>
   <BrowserRouter>
     <Routes>
       <Route path="/register" element={<Register />} />
@@ -16,5 +20,6 @@ export default function App() {
       <Route path="/" element={<Chat />} />
       <Route path='/test' element={<Test />} />
     </Routes>
-  </BrowserRouter>)
+  </BrowserRouter>
+  </SocketContext.Provider>)
 }
