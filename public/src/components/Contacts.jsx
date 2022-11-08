@@ -1,11 +1,13 @@
 import axios from 'axios'
-import React, {useState, useEffect, userRef} from 'react'
+import React, {useState, useEffect, useContext} from 'react'
 import styled from 'styled-components'
 import Logo from '../assets/logojira.svg'
-import {getUnreadNumRoute, host} from '../utils/APIRoutes'
+import {getUnreadNumRoute, clearUnreadNumRoute} from '../utils/APIRoutes'
+import {SocketContext} from '../store/socket-context'
 
-function Contacts({contacts, currentUser, changeChat, socket}) {
+function Contacts({contacts, currentUser, changeChat}) {
 
+  const socket = useContext(SocketContext)
   const [currentUserName, setCurrentUserName] = useState(null)
   const [currentUserImage, setCurrentUserImage] = useState(null)
   const [currentSelected, setCurrentSelected] = useState(null)
@@ -18,6 +20,19 @@ function Contacts({contacts, currentUser, changeChat, socket}) {
     }
 
   }, [currentUser])
+
+  useEffect(() => {
+    const clearUnread = async () => {
+      console.log('clearUnread called', currentSelected)
+      if (currentSelected) {
+        await axios.post(clearUnreadNumRoute, {
+          from: contacts[currentSelected]._id,
+          to: currentUser._id,          
+        })
+      }
+    }
+    clearUnread();
+  }, [currentSelected])
 
   useEffect(() => {
     

@@ -6,3 +6,4 @@ export const allUsersRoute = `${host}/api/auth/allusers`
 export const sendMessageRoute = `${host}/api/messages/addmsg`
 export const getAllMessagesRoute = `${host}/api/messages/getmsg`
 export const getUnreadNumRoute = `${host}/api/messages/getUnread`
+export const clearUnreadNumRoute = `${host}/api/messages/clearUnread`
