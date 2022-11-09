@@ -51,3 +51,19 @@ module.exports.getUnreadNum = async (req, res, next) => {
         next(error)
     }
 }
+
+module.exports.clearUnread = async (req, res, next) => {
+ try {
+    console.log('called clearUnread controller')
+    const {from, to} = req.body;
+    await messageModel.updateMany({
+        sender: {$ne: to},
+        users: {$all: [from, to]},
+        isRead: false
+    }, {$set: {isRead: true}})
+    res.end()
+ } catch (error) {
+    console.log('error in clearUnread', error);
+    next(error)   
+ }   
+}
