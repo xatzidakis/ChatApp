@@ -23,12 +23,12 @@ function Contacts({contacts, currentUser, changeChat}) {
 
   useEffect(() => {
     const clearUnread = async () => {
-      console.log('clearUnread called', currentSelected)
-      if (currentSelected) {
+      if (currentSelected !== null) {
         await axios.post(clearUnreadNumRoute, {
           from: contacts[currentSelected]._id,
           to: currentUser._id,          
         })
+        setUnreadNum(prev => [...prev.slice(0, currentSelected), 0, ...prev.slice(currentSelected + 1)]) // To prevent array mutation
       }
     }
     clearUnread();
