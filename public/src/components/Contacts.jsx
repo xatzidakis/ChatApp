@@ -4,6 +4,7 @@ import styled from 'styled-components'
 import Logo from '../assets/logojira.svg'
 import {getUnreadNumRoute, clearUnreadNumRoute} from '../utils/APIRoutes'
 import {SocketContext} from '../store/socket-context'
+import { useCallback } from 'react'
 
 function Contacts({contacts, currentUser, changeChat}) {
 
@@ -35,17 +36,30 @@ function Contacts({contacts, currentUser, changeChat}) {
   }, [currentSelected])
 
   useEffect(() => {
-    
-    const getUnread = async () => {
-      const promiseArr = contacts.map( (contact, index) => 
-      axios.post(getUnreadNumRoute, {from: contact._id, to: currentUser._id})
-      )
-      const values = (await Promise.all(promiseArr)).map(value => value.data)
-      setUnreadNum(values)    
-    }
+    console.log('fired useeffect getUnread')
     if(currentUser)
     getUnread();
   }, [contacts])
+  
+  const getUnread = useCallback( async () => {
+    const promiseArr = contacts.map( (contact, index) => 
+    axios.post(getUnreadNumRoute, {from: contact._id, to: currentUser._id})
+    )
+    const values = (await Promise.all(promiseArr)).map(value => value.data)
+    setUnreadNum(values)    
+  }, [contacts])
+  
+  useEffect(() => {
+      const listener = data => {
+        if(data.from !== contacts[currentSelected]._id) {
+          getUnread();
+        }
+      }
+        socket.on('msg-receive', listener)
+        return () => socket.removeListener('msg-receive', listener)
+  }, [socket, currentSelected])
+  
+
 
   const changeCurrentChat = (index, contact) => {
     setCurrentSelected(index);
@@ -85,7 +99,7 @@ function Contacts({contacts, currentUser, changeChat}) {
             }
             
           </div>
-          <div className="current-user">
+          <div className="current-user" onClick={() => console.log('contacts:', contacts)}>
           <div className="avatar">
                       <img src={`data:image/svg+xml;base64,${currentUserImage}`} alt="avatar" />
                     </div>
