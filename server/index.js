@@ -42,18 +42,20 @@ io.on('connection', (socket) => {
     global.chatSocket = socket
     socket.on('user-connected', userId => {
         onlineUsers.set(userId, socket.id)
-        console.log('onlineUsers:', onlineUsers.size)
+        // console.log('onlineUsers:', onlineUsers)
     })
 
     socket.on('send-msg', data => {
         const sendUserSocket = onlineUsers.get(data.to)
-        if(sendUserSocket) {
-            socket.to(sendUserSocket).emit('msg-receive', data)
-        }
+        // console.log('on send-msg in server:', socket.id, data)
+        // if(sendUserSocket) {
+            socket.broadcast.emit('msg-receive', data)
+            // socket.to(sendUserSocket).emit('msg-receive', data)
+        // }
     })
 
-    socket.on('test-socket', data => {
-        console.log('Test socket fired with data:', data)
-        // socket.emit('lala', 'lala from index.js')
+    socket.on('testing', data => {
+        // console.log('Test socket fired with data:', data)
+        // socket.broadcast.emit('testing-back', 'lala from index.js')
     })
 })
