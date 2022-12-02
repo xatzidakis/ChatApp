@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useRef} from 'react'
+import React, {useState, useEffect, useRef, useContext} from 'react'
 import axios from 'axios'
 import styled from 'styled-components'
 import { useNavigate } from 'react-router-dom'
@@ -6,10 +6,10 @@ import { allUsersRoute, host } from '../utils/APIRoutes';
 import Contacts from '../components/Contacts';
 import Welcome from '../components/Welcome';
 import ChatContainer from '../components/ChatContainer';
-import { io } from 'socket.io-client'
+import {SocketContext} from '../store/socket-context'
 
 function Chat() {
-  const socket = useRef();
+  const socket = useContext(SocketContext);
   const navigate = useNavigate();
   const [contacts, setContacts] = useState([])
   const [currentUser, setCurrentUser] = useState(null)
@@ -32,10 +32,10 @@ function Chat() {
   
   useEffect(() => {
     if(currentUser) {
-      socket.current = io(host);
-      socket.current.emit('user-connected', currentUser._id)
+      // socket.current = io(host);
+      socket.emit('user-connected', currentUser._id)
     }
-  }, [currentUser])
+  }, [currentUser, socket])
 
   useEffect(() => {
     const checkCurrUser = async () => {
