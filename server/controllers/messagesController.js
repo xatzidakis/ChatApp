@@ -38,14 +38,14 @@ module.exports.getAllMessage = async (req, res, next) => {
 module.exports.getUnreadNum = async (req, res, next) => {
     try {
         const {from, to} = req.body;
-        console.log('currentUser id:', to)
-        console.log('sender id:', from)
+        // console.log('currentUser id:', to)
+        // console.log('sender id:', from)
         const unreadNum = await messageModel.find({
             sender: { $ne: to},
             users: {$all: [from, to]},
             isRead: false
         }).count()
-        console.log('unreadNum:', unreadNum)
+        // console.log('unreadNum:', unreadNum)
         res.json(unreadNum)
     } catch (error) {
         next(error)
@@ -54,7 +54,7 @@ module.exports.getUnreadNum = async (req, res, next) => {
 
 module.exports.clearUnread = async (req, res, next) => {
  try {
-    console.log('called clearUnread controller')
+    // console.log('called clearUnread controller')
     const {from, to} = req.body;
     await messageModel.updateMany({
         sender: {$ne: to},
