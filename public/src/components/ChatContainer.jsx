@@ -1,12 +1,14 @@
 import axios from 'axios'
-import React, {useState, useEffect, useRef} from 'react'
+import React, {useState, useEffect, useRef, useContext} from 'react'
 import styled from 'styled-components'
 import { getAllMessagesRoute, sendMessageRoute } from '../utils/APIRoutes';
 import ChatInput from './ChatInput';
 import Logout from './Logout';
 import { v4 as uuidv4} from 'uuid'
+import { SocketContext } from '../store/socket-context';
 
-export default function ChatContainer({currentChat, currentUser, socket}) {
+export default function ChatContainer({currentChat, currentUser}) {
+    const socket = useContext(SocketContext)
     const [messages, setMessages] = useState([])
     const [arrivalMessage, setArrivalMessage] = useState(null)
 
@@ -14,7 +16,7 @@ export default function ChatContainer({currentChat, currentUser, socket}) {
 
     useEffect(() => {
         const getChat = async () => {
-            if(currentChat) {
+            if(currentChat && currentUser) {
 
                 const response = await axios.post(getAllMessagesRoute, {
                     from: currentUser._id,
@@ -25,7 +27,7 @@ export default function ChatContainer({currentChat, currentUser, socket}) {
         }
         getChat();
 
-    }, [currentChat])
+    }, [currentChat, currentUser])
 
     const handleSendMsg = async (msg) => {
         await axios.post(sendMessageRoute, {
@@ -33,7 +35,7 @@ export default function ChatContainer({currentChat, currentUser, socket}) {
             to: currentChat._id,
             message: msg,
         })
-        socket.current.emit('send-msg', {
+        socket.emit('send-msg', {
             to:currentChat._id,
             from: currentUser._id,
             message: msg,
@@ -44,14 +46,14 @@ export default function ChatContainer({currentChat, currentUser, socket}) {
     }
 
     useEffect(() => {
-        if(socket.current) {
-            socket.current.on('msg-receive', data => {
-                if(data.from === currentChat._id) {
-                    setArrivalMessage({fromSelf: false, message: data.message})
-                }
-            })
+        const listener = data => {
+            if(data.from === currentChat._id) {
+                setArrivalMessage({fromSelf: false, message: data.message})
+            }
         }
-    }, [])
+            socket.on('msg-receive', listener)
+            return () => socket.removeListener('msg-receive', listener)
+    }, [socket])
 
     useEffect(() => {
         arrivalMessage && setMessages(prev => [...prev, arrivalMessage])
