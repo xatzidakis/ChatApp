@@ -1,117 +1,132 @@
-import axios from 'axios'
-import React, {useState, useEffect, useContext} from 'react'
-import styled from 'styled-components'
-import Logo from '../assets/logojira.svg'
-import {getUnreadNumRoute, clearUnreadNumRoute} from '../utils/APIRoutes'
-import {SocketContext} from '../store/socket-context'
-import { useCallback } from 'react'
+import axios from "axios";
+import React, { useState, useEffect, useContext } from "react";
+import styled from "styled-components";
+import Logo from "../assets/logojira.svg";
+import { getUnreadNumRoute, clearUnreadNumRoute } from "../utils/APIRoutes";
+import { SocketContext } from "../store/socket-context";
+import { useCallback } from "react";
 
-function Contacts({contacts, currentUser, changeChat}) {
-
-  const socket = useContext(SocketContext)
-  const [currentUserName, setCurrentUserName] = useState(null)
-  const [currentUserImage, setCurrentUserImage] = useState(null)
-  const [currentSelected, setCurrentSelected] = useState(null)
-  const [unreadNum, setUnreadNum] = useState([])
+function Contacts({ contacts, currentUser, changeChat }) {
+  const socket = useContext(SocketContext);
+  const [currentUserName, setCurrentUserName] = useState(null);
+  const [currentUserImage, setCurrentUserImage] = useState(null);
+  const [currentSelected, setCurrentSelected] = useState(null);
+  const [unreadNum, setUnreadNum] = useState([]);
 
   useEffect(() => {
-    if(currentUser) {
-      setCurrentUserImage(currentUser.avatarImage)
-      setCurrentUserName(currentUser.username)
+    if (currentUser) {
+      setCurrentUserImage(currentUser.avatarImage);
+      setCurrentUserName(currentUser.username);
     }
-
-  }, [currentUser])
+  }, [currentUser]);
 
   useEffect(() => {
     const clearUnread = async () => {
       if (currentSelected !== null) {
         await axios.post(clearUnreadNumRoute, {
           from: contacts[currentSelected]._id,
-          to: currentUser._id,          
-        })
-        setUnreadNum(prev => [...prev.slice(0, currentSelected), 0, ...prev.slice(currentSelected + 1)]) // To prevent array mutation
+          to: currentUser._id,
+        });
+        setUnreadNum((prev) => [
+          ...prev.slice(0, currentSelected),
+          0,
+          ...prev.slice(currentSelected + 1),
+        ]); // To prevent array mutation
       }
-    }
+    };
     clearUnread();
-  }, [currentSelected])
+  }, [currentSelected, currentUser?._id, contacts]);
+
+  const getUnread = useCallback(async () => {
+    const promiseArr = contacts.map((contact, index) =>
+      axios.post(getUnreadNumRoute, { from: contact._id, to: currentUser._id })
+    );
+    const values = (await Promise.all(promiseArr)).map((value) => value.data);
+    setUnreadNum(values);
+  }, [contacts, currentUser?._id]);
 
   useEffect(() => {
-    console.log('fired useeffect getUnread')
-    if(currentUser)
-    getUnread();
-  }, [contacts])
-  
-  const getUnread = useCallback( async () => {
-    const promiseArr = contacts.map( (contact, index) => 
-    axios.post(getUnreadNumRoute, {from: contact._id, to: currentUser._id})
-    )
-    const values = (await Promise.all(promiseArr)).map(value => value.data)
-    setUnreadNum(values)    
-  }, [contacts])
-  
-  useEffect(() => {
-      const listener = data => {
-        if(data.from !== contacts[currentSelected]._id) {
-          getUnread();
-        }
+    console.log("fired useeffect getUnread");
+    if (currentUser) getUnread();
+  }, [currentUser, getUnread]);
+
+  useEffect( () => {
+    const listener =  async (data) => {
+      console.log("listener on client:", data, currentSelected);
+      if ((data.from !== contacts[currentSelected]?._id) || contacts[currentSelected] === undefined) {
+        console.log('current Selected:', currentSelected)
+         await getUnread();
       }
-        socket.on('msg-receive', listener)
-        return () => socket.removeListener('msg-receive', listener)
-  }, [socket, currentSelected])
-  
-
+    };
+    socket.on("msg-receive", listener);
+    return () => socket.removeListener("msg-receive", listener);
+  }, [socket, currentSelected, contacts, getUnread]);
 
   const changeCurrentChat = (index, contact) => {
     setCurrentSelected(index);
-    changeChat(contact)
-  }
+    changeChat(contact);
+  };
 
   return (
     <>
-    {
-      currentUserImage && currentUserName && (
+      {currentUserImage && currentUserName && (
         <Container>
           <div className="brand">
-            <img src={Logo} alt='logo' />
+            <img src={Logo} alt="logo" />
             <h3>ChatApp</h3>
           </div>
           <div className="contacts">
-            {
-              contacts.map((contact, index) => {
-                return (
-                  <div className={`contact ${index === currentSelected ? 'selected' : ''}`} key={index} onClick={() => changeCurrentChat(index, contact)}>
-                    <div className="avatar">
-                      <img src={`data:image/svg+xml;base64,${contact.avatarImage}`} alt="avatar" />
-                    </div>
-                    <div className="username">
-                      <h2>{contact.username}</h2>
-                    </div>
-                    <div className="info">
-                      <div className="timestamp">Timestamp</div>
-                      {/* <div className={`unreadNum ${unreadNum[index] && 'hasUnread'}`}> */}
-                      <div className={`unreadNum ${unreadNum[index] > 0 ? 'hasUnread' : ''}`}>
-                        {unreadNum[index] > 0 ? unreadNum[index] : ''}
-                      </div>
+            {contacts.map((contact, index) => {
+              return (
+                <div
+                  className={`contact ${
+                    index === currentSelected ? "selected" : ""
+                  }`}
+                  key={index}
+                  onClick={() => changeCurrentChat(index, contact)}
+                >
+                  <div className="avatar">
+                    <img
+                      src={`data:image/svg+xml;base64,${contact.avatarImage}`}
+                      alt="avatar"
+                    />
+                  </div>
+                  <div className="username">
+                    <h2>{contact.username}</h2>
+                  </div>
+                  <div className="info">
+                    <div className="timestamp">Timestamp</div>
+                    {/* <div className={`unreadNum ${unreadNum[index] && 'hasUnread'}`}> */}
+                    <div
+                      className={`unreadNum ${
+                        unreadNum[index] > 0 ? "hasUnread" : ""
+                      }`}
+                    >
+                      {unreadNum[index] > 0 ? unreadNum[index] : ""}
                     </div>
                   </div>
-                )
-              })
-            }
-            
+                </div>
+              );
+            })}
           </div>
-          <div className="current-user" onClick={() => console.log('contacts:', contacts)}>
-          <div className="avatar">
-                      <img src={`data:image/svg+xml;base64,${currentUserImage}`} alt="avatar" />
-                    </div>
-                    <div className="username">
-                      <h2>{currentUserName}</h2>
-                    </div>
+          <div
+            className="current-user"
+            onClick={() => console.log("contacts:", socket.id)}
+          >
+            <div className="avatar">
+              <img
+                src={`data:image/svg+xml;base64,${currentUserImage}`}
+                alt="avatar"
+              />
+            </div>
+            <div className="username">
+              <h2>{currentUserName}</h2>
+            </div>
           </div>
         </Container>
-      )
-    }
+      )}
     </>
-  )
+  );
 }
 
 const Container = styled.div`
@@ -219,11 +234,10 @@ const Container = styled.div`
       .username {
         h2 {
           font-size: 1rem;
-
         }
       }
     }
   }
 `;
 
-export default Contacts
+export default Contacts;
