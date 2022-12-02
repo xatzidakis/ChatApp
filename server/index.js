@@ -36,7 +36,7 @@ const io = socket(server, {
     }
 })
 
-global.onlineUsers = new Map();
+const onlineUsers = new Map();
 
 io.on('connection', (socket) => {
     global.chatSocket = socket
@@ -49,8 +49,8 @@ io.on('connection', (socket) => {
         const sendUserSocket = onlineUsers.get(data.to)
         // console.log('on send-msg in server:', socket.id, data)
         // if(sendUserSocket) {
-            socket.broadcast.emit('msg-receive', data)
-            // socket.to(sendUserSocket).emit('msg-receive', data)
+            // socket.broadcast.emit('msg-receive', data)
+            socket.to(sendUserSocket).emit('msg-receive', data)
         // }
     })
 
