@@ -1,4 +1,4 @@
-import React, { useRef } from 'react'
+import React from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Chat from './pages/Chat'
 import Login from './pages/Login'
@@ -6,8 +6,6 @@ import Register from './pages/Register'
 import SetAvatar from './pages/SetAvatar'
 import Test from './pages/Test'
 import {SocketContext, socket} from './store/socket-context'
-import {io} from 'socket.io-client'
-import { host } from './utils/APIRoutes'
 
 export default function App() {
   return (
